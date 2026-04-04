@@ -168,7 +168,7 @@ $resultado = $conn->query($sql);
         <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             <div>
                 <i class="fa-solid fa-mug-hot text-2xl text-solo-gold mb-3"></i>
-                <h4 class="font-bold font-simonetta text-solo-green mb-1">Café Inclusivo</h4>
+                <h4 class="font-bold font-simonetta text-solo-green mb-1">Café Incluso</h4>
                 <p class="text-xs text-gray-500 font-bree">Consulte as opções no local.</p>
             </div>
             <div>
