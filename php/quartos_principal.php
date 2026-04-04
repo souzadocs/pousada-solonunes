@@ -2,7 +2,8 @@
 include '../api/db.php';
 
 // Busca os quartos ordenados e agruparemos no PHP para pegar o MENOR PREÇO e a FOTO do primeiro
-$sql = "SELECT * FROM quartos ORDER BY nome ASC, preco_noite ASC";
+// 🔥 ATUALIZADO: Agora puxa respeitando a ORDEM do painel administrativo
+$sql = "SELECT * FROM quartos ORDER BY ordem ASC, nome ASC, preco_noite ASC";
 $resultado = $conn->query($sql);
 ?>
 <!DOCTYPE html>
