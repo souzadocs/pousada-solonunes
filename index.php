@@ -114,7 +114,7 @@ $quartos_destaque = $conn->query($sql);
 
     <section class="relative h-screen w-full flex flex-col items-center justify-center">
         <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-            <source src="" type="../videos/solonuness.mp4">
+            <source src="../videos/solonuness.mp4" type="video/mp4">
         </video>
         <div class="absolute inset-0 bg-black/40 z-10"></div>
         
