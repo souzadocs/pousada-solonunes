@@ -182,7 +182,10 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
         </div>
     </section>
 
-    <section class="py-32 bg-parallax relative flex items-center justify-center bg-gray-800" style="background-image: url('');">
+    <section class="py-32 bg-parallax relative flex items-center justify-center bg-gray-800";>
+        <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
+            <source src="videos/solonuness.mp4" type="video/mp4">
+        </video>
         <div class="absolute inset-0 bg-black/50"></div>
         <div class="relative z-10 text-center" data-aos="zoom-in">
             <span class="text-white uppercase tracking-[0.3em] text-sm font-bold block mb-2 drop-shadow-md">Pousada Solo Nunes</span>
