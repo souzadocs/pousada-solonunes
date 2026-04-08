@@ -1,3 +1,18 @@
+<?php
+// Adicionado: Conexão com o banco de dados
+include 'api/db.php';
+
+// Busca especificamente quartos com Casal, Triplo, Família ou Quádruplo no nome 
+// e ordena pela capacidade para aparecer na ordem certa (2, 3 e 4 pessoas)
+$sql = "SELECT * FROM quartos 
+        WHERE nome LIKE '%Casal%' 
+           OR nome LIKE '%Triplo%' 
+           OR nome LIKE '%Família%' 
+           OR nome LIKE '%Quádruplo%' 
+        ORDER BY capacidade ASC 
+        LIMIT 3";
+$quartos_destaque = $conn->query($sql);
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,6 +23,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Simonetta:ital,wght@0,400;0,900;1,400&family=Bree+Serif&family=Chau+Philomene+One:ital@0;1&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -31,10 +48,9 @@
     </script>
 
     <style>
-        body { font-family: 'Chau Philomene One', sans-serif; scroll-behavior: smooth; background-color: #FAF7F2; color: #2F4F4F; }
+        body { font-family: 'Chau Philomene One', sans-serif; scroll-behavior: smooth; background-color: #FAF7F2; color: #2F4F4F; overflow-x: hidden; }
         
         .top-bar { transition: all 0.4s ease-in-out; z-index: 50; }
-        /* Quando a barra rolar, fica branca com sombra leve */
         .top-bar.scrolled { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 10px 0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .top-bar.scrolled .nav-link { color: #2F4F4F; }
         .top-bar.scrolled .menu-icon span { background-color: #2F4F4F; }
@@ -55,18 +71,8 @@
         .menu-overlay.active { display: block; }
         body.menu-open { overflow: hidden; }
 
-        /* Estilo sutil de folhagens de fundo */
-        .bg-leaves {
-            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
-            opacity: 0.4;
-        }
-
-        /* Animação para a seta de rolagem */
-        @keyframes bounce-slow {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(10px); }
-        }
-        .animate-bounce-slow { animation: bounce-slow 2s infinite; }
+        /* Estilo parallax */
+        .bg-parallax { background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: cover; }
     </style>
 </head>
 <body class="antialiased">
@@ -77,7 +83,7 @@
         </a>
 
         <div class="flex items-center gap-8 font-bree tracking-wider">
-            <a href="php/reserva.php" class="hidden md:block bg-solo-green text-white px-7 py-2.5 rounded-full font-bold text-sm hover:bg-solo-gold hover:text-white transition-all duration-300 shadow-md">Fazer Reserva</a>
+            <a href="php/reserva.php" class="hidden md:block bg-solo-gold text-white px-7 py-2.5 rounded-full font-bold text-sm hover:bg-solo-green transition-all duration-300 shadow-md uppercase">Reservar</a>
             <button id="mobile-menu" class="menu-icon flex flex-col gap-1.5 cursor-pointer">
                 <span class="w-8 h-1 bg-white rounded transition-colors shadow-sm"></span>
                 <span class="w-8 h-1 bg-white rounded transition-colors shadow-sm"></span>
@@ -96,8 +102,8 @@
             <a href="index.php" class="hover:text-solo-gold border-b border-gray-200 pb-2 transition">Início</a>
             <a href="#sobre" class="hover:text-solo-gold border-b border-gray-200 pb-2 transition">A Pousada</a>
             <a href="#quartos" class="hover:text-solo-gold border-b border-gray-200 pb-2 transition">Acomodações</a>
-            <a href="#passeios" class="hover:text-solo-gold border-b border-gray-200 pb-2 transition">Passeios na Amazônia</a>
-            <a href="#contato" class="hover:text-solo-gold border-b border-gray-200 pb-2 transition">Localização & Contato</a>
+            <a href="#passeios" class="hover:text-solo-gold border-b border-gray-200 pb-2 transition">Passeios e Eventos</a>
+            <a href="#contato" class="hover:text-solo-gold border-b border-gray-200 pb-2 transition">Contatos</a>
         </nav>
         <div class="mt-auto pt-10 border-t border-gray-200">
             <p class="text-xs text-solo-green tracking-widest mb-2 uppercase font-bold">Fale Conosco</p>
@@ -106,259 +112,249 @@
         </div>
     </aside>
 
-    <section class="relative h-screen w-full overflow-hidden flex items-center justify-center">
+    <section class="relative h-screen w-full flex flex-col items-center justify-center">
         <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-            <source src="videos/solonuness.mp4" type="video/mp4">
+            <source src="" type="video/mp4">
         </video>
+        <div class="absolute inset-0 bg-black/40 z-10"></div>
         
-        <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-10"></div>
-        
-        <div class="relative z-20 text-center px-4 max-w-5xl mt-16">
-            <h1 class="text-4xl md:text-6xl lg:text-7xl font-light mb-4 drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] font-serif tracking-wide text-white leading-tight">
-                Pousada Solo Nunes
+        <div class="relative z-20 text-center px-4 w-full max-w-6xl mt-20" data-aos="fade-up" data-aos-duration="1000">
+            <p class="text-solo-gold font-bold tracking-[0.3em] uppercase text-sm mb-4 drop-shadow-md">Pousada Solo Nunes</p>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-black mb-12 drop-shadow-lg font-bree text-white leading-tight uppercase">
+                Viva Momentos<br>Inesquecíveis em Manaus
             </h1>
-            <p class="text-lg md:text-xl text-solo-gold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] font-sans font-bold tracking-widest uppercase">
-                O seu refúgio exclusivo na Amazônia
-            </p>
-        </div>
-
-        <a href="#welcome" class="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-20 text-white/80 hover:text-solo-gold transition-colors animate-bounce-slow">
-            <i class="fa-solid fa-chevron-down text-4xl drop-shadow-md"></i>
-        </a>
-    </section>
-
-    <section id="welcome" class="pt-24 pb-16 relative bg-solo-sand z-30">
-        <div class="container mx-auto px-6 text-center max-w-4xl mb-16">
-            <span class="bg-solo-green/10 text-solo-green px-6 py-2 rounded-full text-xs font-bold uppercase mb-6 inline-block border border-solo-green/20 font-bree tracking-widest shadow-sm">
-                <i class="fa-solid fa-leaf mr-2 text-solo-gold"></i> No Coração de Manaus
-            </span>
-            <p class="text-2xl md:text-3xl mb-10 italic font-bree text-solo-green font-light leading-relaxed">
-                Ambiente familiar, descanso garantido e o ponto de partida perfeito para a sua aventura, com o conforto que você merece.
-            </p>
-            <div class="flex flex-col md:flex-row gap-4 justify-center font-bree">
-                <a href="#quartos" class="bg-white text-solo-green border border-gray-200 px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all duration-300 shadow-sm text-lg">Ver Suítes</a>
-                <a href="php/reserva.php" class="bg-solo-orange text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-700 hover:shadow-lg transition-all duration-300 shadow-md text-lg">Garantir Reserva</a>
-            </div>
-        </div>
-
-        <div class="container mx-auto px-6">
-            <div class="bg-white rounded-[2rem] shadow-xl p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center font-bree border border-gray-100">
-                <div class="flex flex-col items-center">
-                    <div class="w-16 h-16 bg-solo-light-green rounded-full flex items-center justify-center text-solo-green text-2xl mb-4">
-                        <i class="fa-solid fa-star"></i>
-                    </div>
-                    <h3 class="text-3xl font-extrabold text-solo-green font-simonetta mb-1">9.3</h3>
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Avaliação Booking</p>
-                </div>
-                <div class="flex flex-col items-center border-t md:border-t-0 md:border-l border-gray-100 pt-6 md:pt-0">
-                    <div class="w-16 h-16 bg-solo-light-green rounded-full flex items-center justify-center text-solo-green text-2xl mb-4">
-                        <i class="fa-solid fa-wifi"></i>
-                    </div>
-                    <h3 class="text-2xl font-extrabold text-solo-green font-simonetta mb-1 mt-2">Wi-Fi Grátis</h3>
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Em toda a pousada</p>
-                </div>
-                <div class="flex flex-col items-center border-t lg:border-t-0 lg:border-l border-gray-100 pt-6 lg:pt-0">
-                    <div class="w-16 h-16 bg-solo-light-green rounded-full flex items-center justify-center text-solo-green text-2xl mb-4">
-                        <i class="fa-solid fa-car"></i>
-                    </div>
-                    <h3 class="text-2xl font-extrabold text-solo-green font-simonetta mb-1 mt-2">Estacionamento</h3>
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Privativo e Cortesia</p>
-                </div>
-                <div class="flex flex-col items-center border-t md:border-t-0 md:border-l border-gray-100 pt-6 md:pt-0">
-                    <div class="w-16 h-16 bg-solo-light-green rounded-full flex items-center justify-center text-solo-green text-2xl mb-4">
-                        <i class="fa-solid fa-map-location-dot"></i>
-                    </div>
-                    <h3 class="text-2xl font-extrabold text-solo-green font-simonetta mb-1 mt-2">Localização</h3>
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-wider">Fácil acesso ao Aeroporto</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="sobre" class="py-20 bg-white">
-        <div class="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
-            <div class="lg:w-1/2">
-                <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-2 block">Nossa História</span>
-                <h2 class="text-4xl md:text-5xl font-bold font-simonetta text-solo-green mb-6">Sua Casa Longe de Casa</h2>
-                <p class="text-gray-600 font-bree text-lg leading-relaxed mb-6 font-light">
-                    Localizada no tranquilo bairro Lírio do Vale, a Pousada Solo Nunes oferece a combinação perfeita entre a hospitalidade manauara e o conforto que você merece após um dia intenso de exploração turística ou compromissos de negócios.
-                </p>
-                <p class="text-gray-600 font-bree text-lg leading-relaxed mb-8 font-light">
-                    Nossa missão é proporcionar uma estadia segura, acolhedora e com um atendimento humano e personalizado 24 horas por dia. Trabalhamos com higienização rigorosa.
-                </p>
-                <div class="flex items-center gap-4 bg-solo-sand p-4 rounded-xl border border-gray-100">
-                    <i class="fa-solid fa-clock-rotate-left text-3xl text-solo-gold"></i>
-                    <div>
-                        <h4 class="font-bold text-solo-green font-bree">Recepção Flexível</h4>
-                        <p class="text-sm text-gray-500 font-bree">Atendimento humanizado para seu check-in.</p>
-                    </div>
-                </div>
-            </div>
             
-            <div class="lg:w-1/2 w-full">
-                <img src="imagens/Entrada-solonunes.png" alt="Pousada Exterior" loading="lazy" class="rounded-[2rem] shadow-2xl w-full h-[500px] lg:h-[650px] object-cover border-[4px] border-solo-gold">
-            </div>
-        </div>
-    </section>
-
-    <section id="quartos" class="py-24 relative bg-solo-sand">
-        <div class="absolute inset-0 bg-leaves z-0 pointer-events-none"></div>
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16">
-                <div class="max-w-xl mb-6 md:mb-0">
-                    <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-2 block">Acomodações</span>
-                    <h2 class="text-4xl md:text-5xl font-bold mb-4 font-simonetta text-solo-green">Descanse na Natureza</h2>
-                    <p class="text-gray-600 text-lg font-bree font-light">Quartos climatizados com frigobar, camas de excelência e limpeza impecável para renovar suas energias.</p>
-                </div>
-                <a href="php/quartos_principal.php" class="hidden md:flex items-center gap-2 bg-white text-solo-green px-6 py-2.5 rounded-full font-bold hover:bg-solo-green hover:text-white transition-all uppercase text-xs tracking-widest font-bree shadow-sm border border-gray-200">
-                    Ver todos os quartos <i class="fa-solid fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                <div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="imagens/quartos/quarto-casal.jpeg" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 border-[3px] border-solo-gold rounded-t-[2rem]" alt="Duplo">
-                    </div>
-                    <div class="p-8 flex-grow flex flex-col">
-                        <h3 class="text-2xl font-bold mb-2 font-simonetta text-solo-green">Suíte Casal
-                        </h3>
-                        <p class="text-gray-500 mb-6 leading-relaxed font-bree text-sm font-light flex-grow">Praticidade e muito conforto no Lírio do Vale 2. Ideal para casais ou viajantes individuais a negócios.</p>
-                        <div class="flex justify-between items-center pt-5 border-t border-gray-100">
-                            <div>
-                                <p class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">A partir de</p>
-                                <span class="text-2xl font-extrabold text-solo-gold font-simonetta">R$ 160<small class="text-xs text-gray-400 font-normal font-chau">/noite</small></span>
-                            </div>
-                            <a href="php/reserva.php" class="bg-solo-light-green text-solo-green px-5 py-2.5 rounded-xl font-bold hover:bg-solo-green hover:text-white transition-colors text-sm font-bree">Reservar</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col relative">
-                    <div class="absolute top-4 right-4 z-20 bg-solo-orange text-white text-[10px] font-bold uppercase px-3 py-1.5 rounded-full shadow-md font-bree tracking-wider">
-                        Mais Popular
-                    </div>
-                    <div class="relative h-64 overflow-hidden">
-                         <img src="imagens/quartos/quarto-casal-superior.png" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 border-[3px] border-solo-gold rounded-t-[2rem]" alt="Triplo">
-                    </div>
-                    <div class="p-8 flex-grow flex flex-col">
-                        <h3 class="text-2xl font-bold mb-2 font-simonetta text-solo-green">Suíte Casal Superior</h3>
-                        <p class="text-gray-500 mb-6 leading-relaxed font-bree text-sm font-light flex-grow">Espaçosa e ideal para pequenas famílias. Conforto extra e cama de excelência para sua estadia em Manaus.</p>
-                        <div class="flex justify-between items-center pt-5 border-t border-gray-100">
-                             <div>
-                                <p class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">A partir de</p>
-                                <span class="text-2xl font-extrabold text-solo-gold font-simonetta">R$ 160<small class="text-xs text-gray-400 font-normal font-chau">/noite</small></span>
-                            </div>
-                            <a href="php/reserva.php" class="bg-solo-light-green text-solo-green px-5 py-2.5 rounded-xl font-bold hover:bg-solo-green hover:text-white transition-colors text-sm font-bree">Reservar</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 flex flex-col">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="imagens/quartos/quarto-familia.jpeg" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 border-[3px] border-solo-gold rounded-t-[2rem]" alt="Família">
-                    </div>
-                    <div class="p-8 flex-grow flex flex-col">
-                        <h3 class="text-2xl font-bold mb-2 font-simonetta text-solo-green">Suíte Família</h3>
-                        <p class="text-gray-500 mb-6 leading-relaxed font-bree text-sm font-light flex-grow">O máximo de espaço para viagens em grupo. Conta com todas as comodidades para relaxar após os passeios.</p>
-                        <div class="flex justify-between items-center pt-5 border-t border-gray-100">
-                             <div>
-                                <p class="text-[10px] text-gray-400 uppercase font-bold mb-0.5">A partir de</p>
-                                <span class="text-2xl font-extrabold text-solo-gold font-simonetta">R$ 455<small class="text-xs text-gray-400 font-normal font-chau">/noite</small></span>
-                            </div>
-                            <a href="php/reserva.php" class="bg-solo-light-green text-solo-green px-5 py-2.5 rounded-xl font-bold hover:bg-solo-green hover:text-white transition-colors text-sm font-bree">Reservar</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-             <div class="text-center md:hidden mt-10">
-                <a href="php/quartos_principal.php" class="inline-block bg-white text-solo-green px-8 py-3.5 rounded-full font-bold border border-gray-200 shadow-sm font-bree uppercase tracking-widest text-xs">Ver Todas as Opções</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 bg-solo-light-green relative">
-        <div class="container mx-auto px-6">
-            <div class="text-center max-w-2xl mx-auto mb-16">
-                <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-2 block">Experiências Reais</span>
-                <h2 class="text-4xl md:text-5xl font-bold font-simonetta text-solo-green mb-4">O que dizem nossos hóspedes</h2>
-                <p class="text-gray-600 font-bree text-lg font-light">Orgulho de manter uma nota excepcional nas principais plataformas de reserva.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
-                    <div class="flex gap-1 text-solo-gold text-sm mb-4">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-gray-600 italic font-bree font-light mb-6 flex-grow">"Lugar maravilhoso, super aconchegante, limpo e organizado. O atendimento foi excepcional do início ao fim. Recomendo de olhos fechados!"</p>
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold font-bree">M</div>
-                        <div>
-                            <p class="font-bold text-solo-green text-sm font-bree">Maria S.</p>
-                            <p class="text-xs text-gray-400">Viajante no Booking.com</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
-                    <div class="flex gap-1 text-solo-gold text-sm mb-4">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-gray-600 italic font-bree font-light mb-6 flex-grow">"Excelente custo-benefício. A localização é ótima para quem precisa ir ao aeroporto e o quarto superou minhas expectativas. Cama muito confortável."</p>
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold font-bree">J</div>
-                        <div>
-                            <p class="font-bold text-solo-green text-sm font-bree">João P.</p>
-                            <p class="text-xs text-gray-400">Viajante no Kayak</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col">
-                    <div class="flex gap-1 text-solo-gold text-sm mb-4">
-                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-                    </div>
-                    <p class="text-gray-600 italic font-bree font-light mb-6 flex-grow">"A recepção é fantástica, nos sentimos em casa. Tudo muito cheiroso e o Wi-fi funciona perfeitamente para trabalhar. Voltaremos com certeza."</p>
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold font-bree">A</div>
-                        <div>
-                            <p class="font-bold text-solo-green text-sm font-bree">Ana C.</p>
-                            <p class="text-xs text-gray-400">Hóspede a negócios</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="passeios" class="py-24 bg-white relative overflow-hidden">
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="bg-solo-light-green rounded-[3rem] p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12 border border-gray-100">
+            <form action="php/reserva.php" method="GET" class="bg-white/90 backdrop-blur-md p-3 md:p-4 rounded-3xl md:rounded-full flex flex-col md:flex-row items-center gap-4 md:gap-2 shadow-2xl mx-auto w-full md:w-auto inline-flex">
                 
-                <div class="lg:w-1/2 relative">
-                    <img src="imagens/passeio_barco.png" alt="Passeio no Rio Negro" loading="lazy" class="rounded-[2rem] shadow-2xl object-cover h-[400px] w-full border-[4px] border-solo-gold">
-                    
-                    <div class="absolute -bottom-10 -right-10 hidden md:block z-20">
-                        <img src="imagens/cachoeira.png" alt="Vitória Régia" loading="lazy" class="rounded-2xl w-56 h-56 object-cover shadow-2xl border-[4px] border-solo-gold">
+                <div class="flex items-center bg-white px-4 py-3 rounded-full flex-1 w-full md:w-auto">
+                    <i class="fa-regular fa-calendar text-solo-green mr-3"></i>
+                    <input type="text" placeholder="Check in / Check out" class="bg-transparent outline-none text-sm font-bree text-gray-700 w-full md:w-40" onfocus="(this.type='date')" onblur="(this.type='text')">
+                </div>
+
+                <div class="hidden md:block w-px h-8 bg-gray-300"></div>
+
+                <div class="flex items-center bg-white px-4 py-3 rounded-full flex-1 w-full md:w-auto justify-between">
+                    <span class="text-sm font-bree text-gray-700">Nº Hóspedes</span>
+                    <div class="flex items-center gap-3">
+                        <button type="button" class="text-gray-400 hover:text-solo-green"><i class="fa-solid fa-minus"></i></button>
+                        <span class="font-bold">2</span>
+                        <button type="button" class="text-gray-400 hover:text-solo-green"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
 
-                <div class="lg:w-1/2 text-center lg:text-left">
-                    <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-2 block">Aventuras Inesquecíveis</span>
-                    <h2 class="text-4xl md:text-5xl font-bold mb-6 font-simonetta text-solo-green">Explore a Magia <br>da Amazônia</h2>
-                    <p class="text-gray-600 text-lg font-bree font-light leading-relaxed mb-8">
-                        Não seja apenas um turista, seja um explorador. Transforme sua estadia conosco em uma experiência completa. Facilitamos o seu acesso aos melhores roteiros da região: do espetacular Encontro das Águas às focagens noturnas de jacarés e visitas a tribos indígenas.
-                    </p>
-                    <ul class="text-left space-y-4 mb-10 text-gray-700 font-bree">
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-water text-solo-gold text-xl"></i> O famoso Encontro das Águas</li>
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-leaf text-solo-green text-xl"></i> Caminhadas e imersão na Selva</li>
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-masks-theater text-solo-orange text-xl"></i> Cultura e Tradições Indígenas</li>
-                    </ul>
+                <button type="submit" class="w-full md:w-auto bg-solo-green text-white px-8 py-3 rounded-full font-bold hover:bg-solo-gold transition-colors text-sm font-bree mt-2 md:mt-0 shadow-md uppercase tracking-wider">
+                    Procurar
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <section id="sobre" class="py-24 bg-solo-sand overflow-hidden">
+        <div class="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
+            <div class="lg:w-1/2" data-aos="fade-right">
+                <span class="text-solo-gold font-bold uppercase tracking-[0.2em] text-xs mb-3 block">Pousada Solo Nunes</span>
+                <h2 class="text-4xl md:text-5xl font-black font-bree text-solo-green mb-8 leading-tight">Porque se hospedar Conosco</h2>
+                <p class="text-gray-600 font-bree text-lg leading-relaxed mb-6 font-light">
+                    A Pousada Solo Nunes se destaca como uma das mais completas e confortáveis de toda Manaus!
+                </p>
+                <p class="text-gray-600 font-bree text-lg leading-relaxed font-light border-l-4 border-solo-gold pl-4 italic">
+                    "Sua localização privilegiada (perto do aeroporto) dá acesso a inúmeros atrativos e rápido deslocamento. Outro destaque é o nosso atendimento, sempre cordial e atencioso com nossos hóspedes."
+                </p>
+                <div class="mt-8 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
+                        <img src="" alt="Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <p class="font-simonetta text-xl text-solo-green font-bold">Marivania Ribeiro Batista</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:w-1/2 w-full relative h-[400px] md:h-[500px]" data-aos="fade-left">
+                <img src="" alt="Fachada" class="absolute top-0 left-0 w-2/3 h-4/5 object-cover rounded-2xl shadow-lg border-4 border-white z-10 bg-gray-200">
+                <img src="" alt="Quarto" class="absolute bottom-0 right-0 w-2/3 h-4/5 object-cover rounded-2xl shadow-2xl border-4 border-white z-20 bg-gray-300">
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 bg-parallax relative flex items-center justify-center bg-gray-800" style="background-image: url('');">
+        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="relative z-10 text-center" data-aos="zoom-in">
+            <span class="text-white uppercase tracking-[0.3em] text-sm font-bold block mb-2 drop-shadow-md">Pousada Solo Nunes</span>
+            <h2 class="text-5xl md:text-7xl font-black font-bree text-white drop-shadow-lg">Colecione<br>Momentos</h2>
+        </div>
+    </section>
+
+    <section id="quartos" class="py-24 bg-solo-sand">
+        <div class="container mx-auto px-6">
+            <div class="mb-16" data-aos="fade-up">
+                <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-2 block">Pousada Solo Nunes</span>
+                <h2 class="text-4xl md:text-5xl font-black font-bree text-solo-green">Suítes em Destaque</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <?php 
+                if ($quartos_destaque && $quartos_destaque->num_rows > 0): 
+                    $delay = 100;
+                    while($q = $quartos_destaque->fetch_assoc()): 
+                ?>
+                <div class="relative h-80 md:h-96 rounded-3xl overflow-hidden group shadow-lg cursor-pointer" data-aos="fade-up" data-aos-delay="<?= $delay ?>">
+                    <?php $img_src = !empty($q['imagem_url']) ? $q['imagem_url'] : ''; ?>
                     
-                    <a href="php/passeios.php" class="inline-block bg-solo-orange text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-700 transition-colors shadow-lg font-bree text-lg">
-                        Conheça Nossos Roteiros
+                    <img src="<?= htmlspecialchars($img_src) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 bg-gray-200" alt="<?= htmlspecialchars($q['nome']) ?>">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    
+                    <div class="absolute bottom-0 left-0 p-6 w-full">
+                        <span class="text-solo-gold text-[10px] font-bold uppercase tracking-widest block mb-1">Suíte</span>
+                        <h3 class="text-2xl font-bold font-bree text-white mb-4"><?= htmlspecialchars($q['nome']) ?></h3>
+                        <a href="php/reserva.php?quarto_nome=<?= urlencode($q['nome']) ?>" class="inline-block bg-white text-black px-5 py-2 rounded-full text-xs font-bold font-bree uppercase tracking-wider hover:bg-solo-gold hover:text-white transition-colors">
+                            + Informações
+                        </a>
+                    </div>
+                </div>
+                <?php 
+                    $delay += 100;
+                    endwhile; 
+                else: 
+                ?>
+                    <p class="col-span-full text-gray-500 font-bree">Nenhum quarto disponível para exibir.</p>
+                <?php endif; ?>
+            </div>
+            
+            <div class="text-center mt-12" data-aos="fade-up">
+                <a href="php/quartos_principal.php" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree uppercase text-sm tracking-widest">Ver todas as Suítes</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-white border-t border-gray-100">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-2 block">Pousada Solo Nunes</span>
+                <h2 class="text-4xl md:text-5xl font-black font-bree text-solo-green">Alguns Diferenciais</h2>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-6 text-center">
+                <div data-aos="zoom-in" data-aos-delay="100">
+                    <i class="fa-solid fa-car text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Estacionamento</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Comodidade e segurança para os hóspedes. A tranquilidade começa desde a chegada.</p>
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="200">
+                    <i class="fa-solid fa-wifi text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Internet Wi-Fi</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Conexão veloz para os hóspedes. Desfrute de uma estadia online perfeita.</p>
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="300">
+                    <i class="fa-solid fa-snowflake text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Ar-condicionado</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Conforto térmico garantido em todas as suítes para amenizar o clima de Manaus.</p>
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="400">
+                    <i class="fa-solid fa-bell-concierge text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Recepção 24h</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Nossa equipe está sempre à disposição para receber e ajudar você a qualquer momento.</p>
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="100">
+                    <i class="fa-solid fa-broom text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Limpeza Rigorosa</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Higienização diária e cuidadosa de todos os ambientes com padrão de hotelaria.</p>
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="200">
+                    <i class="fa-solid fa-mug-hot text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Café da Manhã</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Deleite matinal com uma variedade de alimentos frescos e deliciosos.</p>
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="300">
+                    <i class="fa-solid fa-users text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Quartos para Famílias</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Acomodações espaçosas e perfeitamente preparadas para o bem-estar de todos.</p>
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="400">
+                    <i class="fa-solid fa-map-location-dot text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Localização</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">A pousada está bem próxima do Aeroporto Internacional de Manaus.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-solo-sand">
+        <div class="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
+            <div class="lg:w-1/2" data-aos="fade-right">
+                <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-3 block">O que fazer em</span>
+                <h2 class="text-4xl md:text-5xl font-black font-bree text-solo-green mb-6">Manaus?</h2>
+                <p class="text-gray-600 font-bree text-base leading-relaxed mb-8 font-light">
+                    Manaus é uma cidade vibrante com uma rica cultura e uma natureza exuberante. Aqui estão algumas atividades imperdíveis para quem visita a "Paris brasileira": Explore o Centro Histórico. Visite o icônico Teatro Amazonas, admire a Igreja de São Sebastião e faça compras no Mercado Municipal Adolpho Lisboa...
+                </p>
+                <a href="#" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
+            </div>
+            <div class="lg:w-1/2 w-full" data-aos="fade-left">
+                <img src="" alt="Manaus" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-6 flex flex-col-reverse lg:flex-row items-center gap-16">
+            <div class="lg:w-1/2 w-full" data-aos="fade-right">
+                <img src="" alt="Gastronomia" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
+            </div>
+            <div class="lg:w-1/2" data-aos="fade-left">
+                <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-3 block">Bares & Restaurantes em</span>
+                <h2 class="text-4xl md:text-5xl font-black font-bree text-solo-green mb-6">Manaus</h2>
+                <p class="text-gray-600 font-bree text-base leading-relaxed mb-8 font-light">
+                    A gastronomia de Manaus é uma verdadeira celebração dos sabores da Amazônia. Influenciada pela rica biodiversidade da região, a culinária local é um mosaico de ingredientes exóticos e receitas tradicionais.
+                </p>
+                <a href="#" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 bg-parallax relative bg-gray-900" style="background-image: url('');">
+        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <span class="text-solo-gold font-bold uppercase tracking-[0.2em] text-xs mb-2 block" data-aos="fade-up">Vejam o que os clientes</span>
+            <h2 class="text-4xl md:text-5xl font-black font-bree text-white mb-16" data-aos="fade-up" data-aos-delay="100">Falam da Pousada</h2>
+            
+            <div class="max-w-3xl mx-auto bg-black/40 backdrop-blur-md border border-white/10 p-10 md:p-12 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-8 text-left" data-aos="zoom-in" data-aos-delay="200">
+                <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-solo-gold flex-shrink-0">
+                    <img src="" alt="Cliente" class="w-full h-full object-cover bg-gray-500">
+                </div>
+                <div>
+                    <h4 class="text-white font-bree font-bold text-lg">Bernardo</h4>
+                    <p class="text-gray-400 text-sm mb-4">Engenheiro</p>
+                    <p class="text-gray-200 italic font-light leading-relaxed text-lg">"Não poderia ter escolhido lugar melhor para relaxar, tudo perfeito na Solo Nunes. Uma experiência memorável!"</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-center gap-2 mt-8">
+                <span class="w-3 h-3 rounded-full bg-white opacity-100"></span>
+                <span class="w-3 h-3 rounded-full border border-white opacity-50"></span>
+                <span class="w-3 h-3 rounded-full border border-white opacity-50"></span>
+            </div>
+        </div>
+    </section>
+
+    <section id="passeios" class="py-24 bg-solo-sand">
+        <div class="container mx-auto px-6">
+            <div class="mb-12" data-aos="fade-right">
+                <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-2 block">Agenda da Pousada</span>
+                <h2 class="text-4xl md:text-5xl font-black font-bree text-solo-green">Eventos & Passeios</h2>
+            </div>
+            
+            <div class="max-w-md bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 group" data-aos="fade-up">
+                <div class="h-60 overflow-hidden bg-gray-200">
+                    <img src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Passeio">
+                </div>
+                <div class="p-8 relative">
+                    <span class="absolute -top-5 left-8 bg-white text-solo-green font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded-lg shadow-md border border-gray-100">Passeios</span>
+                    <h3 class="text-2xl font-bold font-bree text-solo-green mb-6 mt-2">Explore a Magia da Amazônia</h3>
+                    <a href="php/passeios.php" class="text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-solo-gold transition-colors border-b-2 border-transparent hover:border-solo-gold pb-1">
+                        Reservar
                     </a>
                 </div>
-
             </div>
         </div>
     </section>
@@ -412,7 +408,18 @@
         </div>
     </footer>
 
+    <a href="https://wa.me/5592993138119" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:bg-green-600 transition-all z-50 animate-bounce">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const sidebar = document.getElementById('sidebar');
@@ -435,14 +442,12 @@
             window.addEventListener('scroll', () => {
                 let currentScroll = window.scrollY;
                 
-                // Esconde o menu ao rolar rapidamente para baixo (efeito mais suave)
                 if (currentScroll > lastScroll && currentScroll > 150) {
                     navbar.classList.add('hidden');
                 } else {
                     navbar.classList.remove('hidden');
                 }
 
-                // Efeito do fundo da barra ao rolar
                 if (currentScroll > 50) {
                     navbar.classList.add('scrolled');
                     menuLines.forEach(line => line.classList.replace('bg-white', 'bg-solo-green'));
