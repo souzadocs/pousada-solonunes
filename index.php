@@ -177,7 +177,7 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
             </div>
             
             <div class="lg:w-1/2 w-full relative h-[400px] md:h-[500px]" data-aos="fade-left">
-                <img src="" alt="Fachada" class="w-full h-full object-cover rounded-2xl shadow-xl bg-gray-300 border-4 border-white">
+                <img src="../imagens/Entrada-solonunes.png" alt="Fachada" class="w-full h-full object-cover rounded-2xl shadow-xl bg-gray-300 border-4 border-white">
             </div>
         </div>
     </section>
@@ -297,7 +297,7 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
                 <a href="https://www.tripadvisor.com.br/Attractions-g303235-Activities-Manaus_Amazon_River_State_of_Amazonas.html" target="_blank" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
             </div>
             <div class="lg:w-1/2 w-full" data-aos="fade-left">
-                <img src="" alt="Manaus" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
+                <img src="../imagens/teatro amazonas.jpg" alt="Manaus" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
             </div>
         </div>
     </section>
@@ -305,7 +305,7 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
     <section class="py-24 bg-white">
         <div class="container mx-auto px-6 flex flex-col-reverse lg:flex-row items-center gap-16">
             <div class="lg:w-1/2 w-full" data-aos="fade-right">
-                <img src="" alt="Gastronomia" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
+                <img src="../imagens/comida.jpg" alt="Gastronomia" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
             </div>
             <div class="lg:w-1/2" data-aos="fade-left">
                 <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-3 block">Bares & Restaurantes em</span>
