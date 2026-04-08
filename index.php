@@ -365,47 +365,100 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
         </div>
     </section>
 
-    <footer id="contato" class="pt-20 pb-10 bg-[#1a1a1a] text-gray-300 font-bree">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 border-b border-white/10 pb-16">
-            
+    <footer id="contato" class="pt-24 pb-12 bg-solo-green text-white relative z-20 font-bree">
+
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16 pb-16 text-center md:text-left">
+
             <div>
-                <h4 class="text-white font-bold text-lg mb-6">Contacts</h4>
-                <p class="mb-4 text-sm font-light leading-relaxed">RUA 16, 82 - Lírio do Vale<br>Manaus - AM</p>
-                <p class="mb-2 text-sm font-light hover:text-solo-gold cursor-pointer transition">reservas@pousadasolonunes.com.br</p>
-                <p class="mb-6 text-sm font-light hover:text-solo-gold cursor-pointer transition">Celular (92) 99313-8119</p>
-                <div class="flex gap-4 text-xl">
-                    <a href="https://www.instagram.com/solo.nunes/" target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://wa.me/5592993138119" target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
-                </div>
-            </div>
-            
-            <div>
-                <h4 class="text-white font-bold text-lg mb-6">Importante</h4>
-                <ul class="space-y-3 text-sm font-light">
-                    <li><a href="#" class="hover:text-solo-gold transition">Home</a></li>
-                    <li><a href="#sobre" class="hover:text-solo-gold transition">A Pousada</a></li>
-                    <li><a href="#quartos" class="hover:text-solo-gold transition">Suítes</a></li>
-                    <li><a href="#" class="hover:text-solo-gold transition">Políticas</a></li>
-                    <li><a href="#" class="hover:text-solo-gold transition">Cancelamento</a></li>
-                    <li><a href="#" class="hover:text-solo-gold transition">Termos e Condições</a></li>
-                </ul>
-            </div>
-            
-            <div>
-                <h4 class="text-white font-bold text-lg mb-6">Newsletter</h4>
-                <form class="relative mb-6">
-                    <input type="email" placeholder="Seu Email" class="w-full bg-transparent border-b border-gray-600 pb-2 text-white outline-none focus:border-solo-gold transition-colors text-sm">
-                    <button type="button" class="absolute right-0 top-0 text-gray-400 hover:text-solo-gold"><i class="fa-regular fa-paper-plane"></i></button>
-                </form>
-                <p class="text-xs font-light leading-relaxed">
-                    Quer receber nossas promoções, descontos eventos, preencha seu email no campo acima.
+
+                <h3 class="text-3xl font-bold mb-4 text-solo-gold font-simonetta">Pousada Solo Nunes</h3>
+
+                <p class="text-solo-light-green/80 text-sm italic leading-relaxed font-light mt-4">
+
+                    Atendimento familiar, camas de excelência e limpeza impecável. O seu ponto de descanso perfeito no bairro Lírio do Vale, pertinho das belezas de Manaus.
+
                 </p>
+
             </div>
+
+           
+
+            <div>
+
+                <h4 class="font-bold mb-6 uppercase text-sm tracking-[0.2em] text-solo-gold">Localização & Contato</h4>
+
+                <ul class="space-y-5 text-sm font-light text-solo-light-green/90">
+
+                    <li class="flex items-start gap-4 justify-center md:justify-start">
+
+                        <i class="fa-solid fa-location-dot text-lg text-solo-gold mt-1"></i>
+
+                        <span class="leading-relaxed">Rua 16, número 82<br>Lírio do Vale, Manaus / AM</span>
+
+                    </li>
+
+                    <li class="flex items-center gap-4 justify-center md:justify-start">
+
+                         <i class="fa-solid fa-phone text-lg text-solo-gold"></i>
+
+                        <span class="font-bold text-lg text-white">(92) 99313-8119</span>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+           
+
+            <div>
+
+                <h4 class="font-bold mb-6 uppercase text-sm tracking-[0.2em] text-solo-gold">Informações Úteis</h4>
+
+                <div class="text-sm space-y-4 border-l-2 border-solo-gold/30 pl-5 text-solo-light-green/90 font-light mx-auto md:mx-0 table">
+
+                    <div>
+
+                        <p class="text-solo-gold font-bold uppercase text-[10px] tracking-widest mb-1">Check-in</p>
+
+                        <p class="font-bold text-white text-base">A partir das 14:00h</p>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-solo-gold font-bold uppercase text-[10px] tracking-widest mb-1 mt-3">Check-out</p>
+
+                        <p class="font-bold text-white text-base">Até as 12:00h</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
-        
-        <div class="container mx-auto px-6 pt-8 text-center text-xs font-light text-gray-500">
-            &copy; Pousada Solo Nunes - Direitos reservados 2026. Desenvolvido por Horizon 360
+
+       
+
+        <div class="text-center border-t border-white/10 pt-8 mt-4">
+
+             <div class="flex justify-center gap-6 text-xl text-solo-light-green/50 mb-6">
+
+                <a href="https://www.instagram.com/solo.nunes/" target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-instagram"></i></a>
+
+               
+
+                <a href="https://wa.me/5592993138119?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20as%20reservas%20na%20Pousada%20Solo%20Nunes." target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
+
+               
+
+            </div>
+
+            <p class="text-white/40 text-xs uppercase tracking-[0.2em] font-bold">&copy; 2026 Pousada Solo Nunes - Manaus/AM. Todos os direitos reservados.</p>
+
         </div>
+
     </footer>
 
     <a href="https://wa.me/5592993138119" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:bg-green-600 transition-all z-50 animate-bounce">
