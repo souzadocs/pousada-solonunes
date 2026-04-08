@@ -2,16 +2,22 @@
 // Adicionado: Conexão com o banco de dados
 include 'api/db.php';
 
-// Busca especificamente quartos com Casal, Triplo, Família ou Quádruplo no nome 
-// e ordena pela capacidade para aparecer na ordem certa (2, 3 e 4 pessoas)
-$sql = "SELECT * FROM quartos 
-        WHERE nome LIKE '%Casal%' 
-           OR nome LIKE '%Triplo%' 
-           OR nome LIKE '%Família%' 
-           OR nome LIKE '%Quádruplo%' 
-        ORDER BY capacidade ASC 
-        LIMIT 3";
-$quartos_destaque = $conn->query($sql);
+// Busca todos os quartos respeitando a ordem do painel admin
+$sql = "SELECT * FROM quartos ORDER BY ordem ASC, preco_noite ASC";
+$resultado_banco = $conn->query($sql);
+
+$quartos_vitrine = [];
+if ($resultado_banco && $resultado_banco->num_rows > 0) {
+    while($q = $resultado_banco->fetch_assoc()) {
+        // Agrupa pelo nome base para não repetir o mesmo quarto (ex: Térreo e 1º Andar)
+        $nome_base = trim(preg_replace('/[-\s\d]+$/', '', trim($q['nome'])));
+        if (!isset($quartos_vitrine[$nome_base])) {
+            $quartos_vitrine[$nome_base] = $q;
+        }
+    }
+}
+// Pega apenas os 3 primeiros da lista ordenada
+$quartos_destaque = array_slice($quartos_vitrine, 0, 3);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -114,7 +120,7 @@ $quartos_destaque = $conn->query($sql);
 
     <section class="relative h-screen w-full flex flex-col items-center justify-center">
         <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
-            <source src="../videos/solonuness.mp4" type="video/mp4">
+            <source src="videos/solonuness.mp4" type="video/mp4">
         </video>
         <div class="absolute inset-0 bg-black/40 z-10"></div>
         
@@ -161,8 +167,8 @@ $quartos_destaque = $conn->query($sql);
                     "Sua localização privilegiada (perto do aeroporto) dá acesso a inúmeros atrativos e rápido deslocamento. Outro destaque é o nosso atendimento, sempre cordial e atencioso com nossos hóspedes."
                 </p>
                 <div class="mt-8 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
-                        <img src="" alt="Avatar" class="w-full h-full object-cover">
+                    <div class="w-12 h-12 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center bg-solo-green text-solo-gold text-xl">
+                        <i class="fa-solid fa-user"></i>
                     </div>
                     <div>
                         <p class="font-simonetta text-xl text-solo-green font-bold">Marivania Ribeiro Batista</p>
@@ -171,8 +177,7 @@ $quartos_destaque = $conn->query($sql);
             </div>
             
             <div class="lg:w-1/2 w-full relative h-[400px] md:h-[500px]" data-aos="fade-left">
-                <img src="" alt="Fachada" class="absolute top-0 left-0 w-2/3 h-4/5 object-cover rounded-2xl shadow-lg border-4 border-white z-10 bg-gray-200">
-                <img src="" alt="Quarto" class="absolute bottom-0 right-0 w-2/3 h-4/5 object-cover rounded-2xl shadow-2xl border-4 border-white z-20 bg-gray-300">
+                <img src="" alt="Fachada" class="w-full h-full object-cover rounded-2xl shadow-xl bg-gray-300 border-4 border-white">
             </div>
         </div>
     </section>
@@ -194,9 +199,9 @@ $quartos_destaque = $conn->query($sql);
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <?php 
-                if ($quartos_destaque && $quartos_destaque->num_rows > 0): 
+                if (!empty($quartos_destaque)): 
                     $delay = 100;
-                    while($q = $quartos_destaque->fetch_assoc()): 
+                    foreach($quartos_destaque as $q): 
                 ?>
                 <div class="relative h-80 md:h-96 rounded-3xl overflow-hidden group shadow-lg cursor-pointer" data-aos="fade-up" data-aos-delay="<?= $delay ?>">
                     <?php $img_src = !empty($q['imagem_url']) ? $q['imagem_url'] : ''; ?>
@@ -215,7 +220,7 @@ $quartos_destaque = $conn->query($sql);
                 </div>
                 <?php 
                     $delay += 100;
-                    endwhile; 
+                    endforeach; 
                 else: 
                 ?>
                     <p class="col-span-full text-gray-500 font-bree">Nenhum quarto disponível para exibir.</p>
@@ -246,35 +251,36 @@ $quartos_destaque = $conn->query($sql);
                     <h4 class="font-bold font-bree text-solo-green mb-2">Internet Wi-Fi</h4>
                     <p class="text-xs text-gray-500 font-light leading-relaxed">Conexão veloz para os hóspedes. Desfrute de uma estadia online perfeita.</p>
                 </div>
+                
                 <div data-aos="zoom-in" data-aos-delay="300">
                     <i class="fa-solid fa-snowflake text-3xl text-solo-gold mb-4"></i>
                     <h4 class="font-bold font-bree text-solo-green mb-2">Ar-condicionado</h4>
-                    <p class="text-xs text-gray-500 font-light leading-relaxed">Conforto térmico garantido em todas as suítes para amenizar o clima de Manaus.</p>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Quartos climatizados garantindo todo o conforto durante o calor amazônico.</p>
                 </div>
                 <div data-aos="zoom-in" data-aos-delay="400">
                     <i class="fa-solid fa-bell-concierge text-3xl text-solo-gold mb-4"></i>
                     <h4 class="font-bold font-bree text-solo-green mb-2">Recepção 24h</h4>
-                    <p class="text-xs text-gray-500 font-light leading-relaxed">Nossa equipe está sempre à disposição para receber e ajudar você a qualquer momento.</p>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Nossa equipe de recepção está pronta para lhe atender a qualquer horário do dia ou noite.</p>
                 </div>
                 <div data-aos="zoom-in" data-aos-delay="100">
-                    <i class="fa-solid fa-broom text-3xl text-solo-gold mb-4"></i>
-                    <h4 class="font-bold font-bree text-solo-green mb-2">Limpeza Rigorosa</h4>
-                    <p class="text-xs text-gray-500 font-light leading-relaxed">Higienização diária e cuidadosa de todos os ambientes com padrão de hotelaria.</p>
+                    <i class="fa-solid fa-plane text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Perto do Aeroporto</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Localização estratégica a apenas 6km do Aeroporto Internacional Eduardo Gomes.</p>
                 </div>
                 <div data-aos="zoom-in" data-aos-delay="200">
-                    <i class="fa-solid fa-mug-hot text-3xl text-solo-gold mb-4"></i>
-                    <h4 class="font-bold font-bree text-solo-green mb-2">Café da Manhã</h4>
-                    <p class="text-xs text-gray-500 font-light leading-relaxed">Deleite matinal com uma variedade de alimentos frescos e deliciosos.</p>
+                    <i class="fa-solid fa-volume-xmark text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Quartos Silenciosos</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Acomodações com isolamento acústico garantindo a melhor noite de sono.</p>
                 </div>
                 <div data-aos="zoom-in" data-aos-delay="300">
-                    <i class="fa-solid fa-users text-3xl text-solo-gold mb-4"></i>
-                    <h4 class="font-bold font-bree text-solo-green mb-2">Quartos para Famílias</h4>
-                    <p class="text-xs text-gray-500 font-light leading-relaxed">Acomodações espaçosas e perfeitamente preparadas para o bem-estar de todos.</p>
+                    <i class="fa-solid fa-tv text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">TV de Tela Plana</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Entretenimento nos quartos com as melhores opções para relaxar na sua cama.</p>
                 </div>
                 <div data-aos="zoom-in" data-aos-delay="400">
-                    <i class="fa-solid fa-map-location-dot text-3xl text-solo-gold mb-4"></i>
-                    <h4 class="font-bold font-bree text-solo-green mb-2">Localização</h4>
-                    <p class="text-xs text-gray-500 font-light leading-relaxed">A pousada está bem próxima do Aeroporto Internacional de Manaus.</p>
+                    <i class="fa-solid fa-broom text-3xl text-solo-gold mb-4"></i>
+                    <h4 class="font-bold font-bree text-solo-green mb-2">Limpeza Impecável</h4>
+                    <p class="text-xs text-gray-500 font-light leading-relaxed">Trabalhamos com um padrão de higienização de primeira linha em todos os ambientes.</p>
                 </div>
             </div>
         </div>
@@ -288,7 +294,7 @@ $quartos_destaque = $conn->query($sql);
                 <p class="text-gray-600 font-bree text-base leading-relaxed mb-8 font-light">
                     Manaus é uma cidade vibrante com uma rica cultura e uma natureza exuberante. Aqui estão algumas atividades imperdíveis para quem visita a "Paris brasileira": Explore o Centro Histórico. Visite o icônico Teatro Amazonas, admire a Igreja de São Sebastião e faça compras no Mercado Municipal Adolpho Lisboa...
                 </p>
-                <a href="#" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
+                <a href="https://www.tripadvisor.com.br/Attractions-g303235-Activities-Manaus_Amazon_River_State_of_Amazonas.html" target="_blank" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
             </div>
             <div class="lg:w-1/2 w-full" data-aos="fade-left">
                 <img src="" alt="Manaus" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
@@ -307,7 +313,7 @@ $quartos_destaque = $conn->query($sql);
                 <p class="text-gray-600 font-bree text-base leading-relaxed mb-8 font-light">
                     A gastronomia de Manaus é uma verdadeira celebração dos sabores da Amazônia. Influenciada pela rica biodiversidade da região, a culinária local é um mosaico de ingredientes exóticos e receitas tradicionais.
                 </p>
-                <a href="#" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
+                <a href="https://www.tripadvisor.com.br/Restaurants-g303235-Manaus_Amazon_River_State_of_Amazonas.html" target="_blank" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
             </div>
         </div>
     </section>
@@ -318,21 +324,21 @@ $quartos_destaque = $conn->query($sql);
             <span class="text-solo-gold font-bold uppercase tracking-[0.2em] text-xs mb-2 block" data-aos="fade-up">Vejam o que os clientes</span>
             <h2 class="text-4xl md:text-5xl font-black font-bree text-white mb-16" data-aos="fade-up" data-aos-delay="100">Falam da Pousada</h2>
             
-            <div class="max-w-3xl mx-auto bg-black/40 backdrop-blur-md border border-white/10 p-10 md:p-12 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-8 text-left" data-aos="zoom-in" data-aos-delay="200">
-                <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-solo-gold flex-shrink-0">
-                    <img src="" alt="Cliente" class="w-full h-full object-cover bg-gray-500">
+            <div class="max-w-3xl mx-auto bg-black/40 backdrop-blur-md border border-white/10 p-10 md:p-12 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-8 text-left transition-all duration-500" data-aos="zoom-in" data-aos-delay="200" id="review-container">
+                <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-solo-gold flex-shrink-0 flex items-center justify-center bg-gray-700 text-3xl text-gray-300">
+                    <i class="fa-solid fa-user"></i>
                 </div>
                 <div>
-                    <h4 class="text-white font-bree font-bold text-lg">Bernardo</h4>
-                    <p class="text-gray-400 text-sm mb-4">Engenheiro</p>
-                    <p class="text-gray-200 italic font-light leading-relaxed text-lg">"Não poderia ter escolhido lugar melhor para relaxar, tudo perfeito na Solo Nunes. Uma experiência memorável!"</p>
+                    <h4 class="text-white font-bree font-bold text-lg" id="rev-name">Bernardo</h4>
+                    <p class="text-gray-400 text-sm mb-4" id="rev-role">Viajante no Booking.com</p>
+                    <p class="text-gray-200 italic font-light leading-relaxed text-lg" id="rev-text">"Não poderia ter escolhido lugar melhor para relaxar, tudo perfeito na Solo Nunes. Uma experiência memorável!"</p>
                 </div>
             </div>
             
-            <div class="flex justify-center gap-2 mt-8">
-                <span class="w-3 h-3 rounded-full bg-white opacity-100"></span>
-                <span class="w-3 h-3 rounded-full border border-white opacity-50"></span>
-                <span class="w-3 h-3 rounded-full border border-white opacity-50"></span>
+            <div class="flex justify-center gap-3 mt-8">
+                <button onclick="changeReview(0)" class="rev-dot w-3 h-3 rounded-full bg-white opacity-100 transition-all focus:outline-none"></button>
+                <button onclick="changeReview(1)" class="rev-dot w-3 h-3 rounded-full border border-white opacity-50 hover:opacity-100 transition-all focus:outline-none"></button>
+                <button onclick="changeReview(2)" class="rev-dot w-3 h-3 rounded-full border border-white opacity-50 hover:opacity-100 transition-all focus:outline-none"></button>
             </div>
         </div>
     </section>
@@ -359,52 +365,46 @@ $quartos_destaque = $conn->query($sql);
         </div>
     </section>
 
-    <footer id="contato" class="pt-24 pb-12 bg-solo-green text-white relative z-20 font-bree">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16 pb-16 text-center md:text-left">
+    <footer id="contato" class="pt-20 pb-10 bg-[#1a1a1a] text-gray-300 font-bree">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 border-b border-white/10 pb-16">
+            
             <div>
-                <h3 class="text-3xl font-bold mb-4 text-solo-gold font-simonetta">Pousada Solo Nunes</h3>
-                <p class="text-solo-light-green/80 text-sm italic leading-relaxed font-light mt-4">
-                    Atendimento familiar, camas de excelência e limpeza impecável. O seu ponto de descanso perfeito no bairro Lírio do Vale, pertinho das belezas de Manaus.
-                </p>
+                <h4 class="text-white font-bold text-lg mb-6">Contacts</h4>
+                <p class="mb-4 text-sm font-light leading-relaxed">RUA 16, 82 - Lírio do Vale<br>Manaus - AM</p>
+                <p class="mb-2 text-sm font-light hover:text-solo-gold cursor-pointer transition">reservas@pousadasolonunes.com.br</p>
+                <p class="mb-6 text-sm font-light hover:text-solo-gold cursor-pointer transition">Celular (92) 99313-8119</p>
+                <div class="flex gap-4 text-xl">
+                    <a href="https://www.instagram.com/solo.nunes/" target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://wa.me/5592993138119" target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
             </div>
             
             <div>
-                <h4 class="font-bold mb-6 uppercase text-sm tracking-[0.2em] text-solo-gold">Localização & Contato</h4>
-                <ul class="space-y-5 text-sm font-light text-solo-light-green/90">
-                    <li class="flex items-start gap-4 justify-center md:justify-start">
-                        <i class="fa-solid fa-location-dot text-lg text-solo-gold mt-1"></i>
-                        <span class="leading-relaxed">Rua 16, número 82<br>Lírio do Vale, Manaus / AM</span>
-                    </li>
-                    <li class="flex items-center gap-4 justify-center md:justify-start">
-                         <i class="fa-solid fa-phone text-lg text-solo-gold"></i>
-                        <span class="font-bold text-lg text-white">(92) 99313-8119</span>
-                    </li>
+                <h4 class="text-white font-bold text-lg mb-6">Importante</h4>
+                <ul class="space-y-3 text-sm font-light">
+                    <li><a href="#" class="hover:text-solo-gold transition">Home</a></li>
+                    <li><a href="#sobre" class="hover:text-solo-gold transition">A Pousada</a></li>
+                    <li><a href="#quartos" class="hover:text-solo-gold transition">Suítes</a></li>
+                    <li><a href="#" class="hover:text-solo-gold transition">Políticas</a></li>
+                    <li><a href="#" class="hover:text-solo-gold transition">Cancelamento</a></li>
+                    <li><a href="#" class="hover:text-solo-gold transition">Termos e Condições</a></li>
                 </ul>
             </div>
             
             <div>
-                <h4 class="font-bold mb-6 uppercase text-sm tracking-[0.2em] text-solo-gold">Informações Úteis</h4>
-                <div class="text-sm space-y-4 border-l-2 border-solo-gold/30 pl-5 text-solo-light-green/90 font-light mx-auto md:mx-0 table">
-                    <div>
-                        <p class="text-solo-gold font-bold uppercase text-[10px] tracking-widest mb-1">Check-in</p>
-                        <p class="font-bold text-white text-base">A partir das 14:00h</p>
-                    </div>
-                    <div>
-                        <p class="text-solo-gold font-bold uppercase text-[10px] tracking-widest mb-1 mt-3">Check-out</p>
-                        <p class="font-bold text-white text-base">Até as 12:00h</p>
-                    </div>
-                </div>
+                <h4 class="text-white font-bold text-lg mb-6">Newsletter</h4>
+                <form class="relative mb-6">
+                    <input type="email" placeholder="Seu Email" class="w-full bg-transparent border-b border-gray-600 pb-2 text-white outline-none focus:border-solo-gold transition-colors text-sm">
+                    <button type="button" class="absolute right-0 top-0 text-gray-400 hover:text-solo-gold"><i class="fa-regular fa-paper-plane"></i></button>
+                </form>
+                <p class="text-xs font-light leading-relaxed">
+                    Quer receber nossas promoções, descontos eventos, preencha seu email no campo acima.
+                </p>
             </div>
         </div>
         
-        <div class="text-center border-t border-white/10 pt-8 mt-4">
-             <div class="flex justify-center gap-6 text-xl text-solo-light-green/50 mb-6">
-                <a href="https://www.instagram.com/solo.nunes/" target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-instagram"></i></a>
-                
-                <a href="https://wa.me/5592993138119?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20as%20reservas%20na%20Pousada%20Solo%20Nunes." target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
-                
-            </div>
-            <p class="text-white/40 text-xs uppercase tracking-[0.2em] font-bold">&copy; 2026 Pousada Solo Nunes - Manaus/AM. Todos os direitos reservados.</p>
+        <div class="container mx-auto px-6 pt-8 text-center text-xs font-light text-gray-500">
+            &copy; Pousada Solo Nunes - Direitos reservados 2026. Desenvolvido por Horizon 360
         </div>
     </footer>
 
@@ -420,6 +420,7 @@ $quartos_destaque = $conn->query($sql);
             offset: 100
         });
 
+        // Script Menu
         document.addEventListener('DOMContentLoaded', () => {
             const navbar = document.getElementById('navbar');
             const sidebar = document.getElementById('sidebar');
@@ -459,6 +460,58 @@ $quartos_destaque = $conn->query($sql);
                 lastScroll = currentScroll;
             });
         });
+
+        // Script Avaliações (Booking)
+        const reviews = [
+            { name: "Bernardo", role: "Viajante no Booking.com", text: "\"Não poderia ter escolhido lugar melhor para relaxar, tudo perfeito na Solo Nunes. Uma experiência memorável!\"" },
+            { name: "Carlos M.", role: "Família no Booking.com", text: "\"Ótimo custo-benefício. Quarto muito limpo, ar gelando bem e atendimento excelente. Fica pertinho do aeroporto!\"" },
+            { name: "Fernanda", role: "Casal no Booking.com", text: "\"Fomos muito bem recebidos. A pousada é silenciosa, cama confortável e um ambiente super familiar. Recomendo muito.\"" }
+        ];
+        
+        let currentReview = 0;
+        let reviewTimer;
+
+        function changeReview(index) {
+            currentReview = index;
+            const container = document.getElementById('review-container');
+            
+            // Efeito fade
+            container.style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('rev-name').innerText = reviews[index].name;
+                document.getElementById('rev-role').innerText = reviews[index].role;
+                document.getElementById('rev-text').innerText = reviews[index].text;
+                
+                document.querySelectorAll('.rev-dot').forEach((dot, i) => {
+                    if(i === index) {
+                        dot.classList.replace('opacity-50', 'opacity-100');
+                        dot.classList.replace('border', 'border-0');
+                        dot.classList.add('bg-white');
+                    } else {
+                        dot.classList.replace('opacity-100', 'opacity-50');
+                        dot.classList.remove('bg-white');
+                        dot.classList.add('border', 'border-white');
+                    }
+                });
+                container.style.opacity = '1';
+            }, 300);
+
+            // Reseta o timer automático ao clicar manualmente
+            clearInterval(reviewTimer);
+            startReviewTimer();
+        }
+
+        function startReviewTimer() {
+            reviewTimer = setInterval(() => {
+                let next = (currentReview + 1) % reviews.length;
+                changeReview(next);
+            }, 6000);
+        }
+        
+        // Inicia o carrossel
+        startReviewTimer();
+
     </script>
 </body>
 </html>
