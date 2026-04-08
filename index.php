@@ -18,6 +18,11 @@ if ($resultado_banco && $resultado_banco->num_rows > 0) {
 }
 // Pega apenas os 3 primeiros da lista ordenada
 $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
+
+// Busca o primeiro passeio para a vitrine "Eventos e Passeios"
+$sql_passeio = "SELECT * FROM passeios LIMIT 1";
+$resultado_passeio = $conn->query($sql_passeio);
+$passeio_destaque = ($resultado_passeio && $resultado_passeio->num_rows > 0) ? $resultado_passeio->fetch_assoc() : null;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -177,12 +182,12 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
             </div>
             
             <div class="lg:w-1/2 w-full relative h-[400px] md:h-[500px]" data-aos="fade-left">
-                <img src="../imagens/Entrada-solonunes.png" alt="Fachada" class="w-full h-full object-cover rounded-2xl shadow-xl bg-gray-300 border-4 border-white">
+                <img src="imagens/Entrada-solonunes.png" alt="Fachada" class="w-full h-full object-cover rounded-2xl shadow-xl bg-gray-300 border-4 border-white">
             </div>
         </div>
     </section>
 
-    <section class="py-32 bg-parallax relative flex items-center justify-center bg-gray-800";>
+    <section class="py-32 bg-parallax relative flex items-center justify-center bg-gray-800" style="background-image: url('');">
         <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
             <source src="videos/solonuness.mp4" type="video/mp4">
         </video>
@@ -254,7 +259,6 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
                     <h4 class="font-bold font-bree text-solo-green mb-2">Internet Wi-Fi</h4>
                     <p class="text-xs text-gray-500 font-light leading-relaxed">Conexão veloz para os hóspedes. Desfrute de uma estadia online perfeita.</p>
                 </div>
-                
                 <div data-aos="zoom-in" data-aos-delay="300">
                     <i class="fa-solid fa-snowflake text-3xl text-solo-gold mb-4"></i>
                     <h4 class="font-bold font-bree text-solo-green mb-2">Ar-condicionado</h4>
@@ -300,7 +304,7 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
                 <a href="https://www.tripadvisor.com.br/Attractions-g303235-Activities-Manaus_Amazon_River_State_of_Amazonas.html" target="_blank" class="inline-block border-2 border-solo-green text-solo-green px-8 py-3 rounded-full font-bold hover:bg-solo-green hover:text-white transition-colors font-bree text-sm uppercase">Mais informações</a>
             </div>
             <div class="lg:w-1/2 w-full" data-aos="fade-left">
-                <img src="../imagens/teatro amazonas.jpg" alt="Manaus" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
+                <img src="imagens/teatro amazonas.jpg" alt="Manaus" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
             </div>
         </div>
     </section>
@@ -308,7 +312,7 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
     <section class="py-24 bg-white">
         <div class="container mx-auto px-6 flex flex-col-reverse lg:flex-row items-center gap-16">
             <div class="lg:w-1/2 w-full" data-aos="fade-right">
-                <img src="../imagens/comida.jpg" alt="Gastronomia" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
+                <img src="imagens/comida.jpg" alt="Gastronomia" class="w-full h-[400px] object-cover rounded-3xl shadow-xl bg-gray-300">
             </div>
             <div class="lg:w-1/2" data-aos="fade-left">
                 <span class="text-solo-gold font-bold uppercase tracking-widest text-xs mb-3 block">Bares & Restaurantes em</span>
@@ -327,21 +331,21 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
             <span class="text-solo-gold font-bold uppercase tracking-[0.2em] text-xs mb-2 block" data-aos="fade-up">Vejam o que os clientes</span>
             <h2 class="text-4xl md:text-5xl font-black font-bree text-white mb-16" data-aos="fade-up" data-aos-delay="100">Falam da Pousada</h2>
             
-            <div class="max-w-3xl mx-auto bg-black/40 backdrop-blur-md border border-white/10 p-10 md:p-12 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-8 text-left transition-all duration-500" data-aos="zoom-in" data-aos-delay="200" id="review-container">
+            <div class="max-w-3xl mx-auto bg-black/40 backdrop-blur-md border border-white/10 p-10 md:p-12 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-8 text-left transition-opacity duration-500 ease-in-out" data-aos="zoom-in" data-aos-delay="200" id="review-container">
                 <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-solo-gold flex-shrink-0 flex items-center justify-center bg-gray-700 text-3xl text-gray-300">
                     <i class="fa-solid fa-user"></i>
                 </div>
                 <div>
-                    <h4 class="text-white font-bree font-bold text-lg" id="rev-name">Bernardo</h4>
-                    <p class="text-gray-400 text-sm mb-4" id="rev-role">Viajante no Booking.com</p>
-                    <p class="text-gray-200 italic font-light leading-relaxed text-lg" id="rev-text">"Não poderia ter escolhido lugar melhor para relaxar, tudo perfeito na Solo Nunes. Uma experiência memorável!"</p>
+                    <h4 class="text-white font-bree font-bold text-lg" id="rev-name">Rodrigo</h4>
+                    <p class="text-gray-400 text-sm mb-4" id="rev-role">A negócios no Booking.com</p>
+                    <p class="text-gray-200 italic font-light leading-relaxed text-lg" id="rev-text">"Muito próximo ao aeroporto, facilitou muito a minha viagem a trabalho. Ambiente extremamente limpo, recepção atenciosa e quarto silencioso!"</p>
                 </div>
             </div>
             
-            <div class="flex justify-center gap-3 mt-8">
-                <button onclick="changeReview(0)" class="rev-dot w-3 h-3 rounded-full bg-white opacity-100 transition-all focus:outline-none"></button>
-                <button onclick="changeReview(1)" class="rev-dot w-3 h-3 rounded-full border border-white opacity-50 hover:opacity-100 transition-all focus:outline-none"></button>
-                <button onclick="changeReview(2)" class="rev-dot w-3 h-3 rounded-full border border-white opacity-50 hover:opacity-100 transition-all focus:outline-none"></button>
+            <div class="flex justify-center gap-4 mt-8">
+                <button onclick="changeReview(0)" class="rev-dot w-4 h-4 md:w-3 md:h-3 rounded-full bg-white opacity-100 transition-all focus:outline-none"></button>
+                <button onclick="changeReview(1)" class="rev-dot w-4 h-4 md:w-3 md:h-3 rounded-full border border-white opacity-50 hover:opacity-100 transition-all focus:outline-none"></button>
+                <button onclick="changeReview(2)" class="rev-dot w-4 h-4 md:w-3 md:h-3 rounded-full border border-white opacity-50 hover:opacity-100 transition-all focus:outline-none"></button>
             </div>
         </div>
     </section>
@@ -355,11 +359,16 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
             
             <div class="max-w-md bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 group" data-aos="fade-up">
                 <div class="h-60 overflow-hidden bg-gray-200">
-                    <img src="" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Passeio">
+                    <?php 
+                        $img_passeio = ($passeio_destaque && !empty($passeio_destaque['imagem_url'])) ? $passeio_destaque['imagem_url'] : ''; 
+                    ?>
+                    <img src="<?= htmlspecialchars($img_passeio) ?>" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Passeio em Destaque">
                 </div>
                 <div class="p-8 relative">
                     <span class="absolute -top-5 left-8 bg-white text-solo-green font-bold text-[10px] uppercase tracking-widest px-4 py-2 rounded-lg shadow-md border border-gray-100">Passeios</span>
-                    <h3 class="text-2xl font-bold font-bree text-solo-green mb-6 mt-2">Explore a Magia da Amazônia</h3>
+                    <h3 class="text-2xl font-bold font-bree text-solo-green mb-6 mt-2">
+                        <?= ($passeio_destaque) ? htmlspecialchars($passeio_destaque['nome']) : 'Explore a Magia da Amazônia' ?>
+                    </h3>
                     <a href="php/passeios.php" class="text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-solo-gold transition-colors border-b-2 border-transparent hover:border-solo-gold pb-1">
                         Reservar
                     </a>
@@ -369,99 +378,52 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
     </section>
 
     <footer id="contato" class="pt-24 pb-12 bg-solo-green text-white relative z-20 font-bree">
-
         <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16 pb-16 text-center md:text-left">
-
             <div>
-
                 <h3 class="text-3xl font-bold mb-4 text-solo-gold font-simonetta">Pousada Solo Nunes</h3>
-
                 <p class="text-solo-light-green/80 text-sm italic leading-relaxed font-light mt-4">
-
                     Atendimento familiar, camas de excelência e limpeza impecável. O seu ponto de descanso perfeito no bairro Lírio do Vale, pertinho das belezas de Manaus.
-
                 </p>
-
             </div>
-
-           
-
+            
             <div>
-
                 <h4 class="font-bold mb-6 uppercase text-sm tracking-[0.2em] text-solo-gold">Localização & Contato</h4>
-
                 <ul class="space-y-5 text-sm font-light text-solo-light-green/90">
-
                     <li class="flex items-start gap-4 justify-center md:justify-start">
-
                         <i class="fa-solid fa-location-dot text-lg text-solo-gold mt-1"></i>
-
                         <span class="leading-relaxed">Rua 16, número 82<br>Lírio do Vale, Manaus / AM</span>
-
                     </li>
-
                     <li class="flex items-center gap-4 justify-center md:justify-start">
-
                          <i class="fa-solid fa-phone text-lg text-solo-gold"></i>
-
                         <span class="font-bold text-lg text-white">(92) 99313-8119</span>
-
                     </li>
-
                 </ul>
-
             </div>
-
-           
-
+            
             <div>
-
                 <h4 class="font-bold mb-6 uppercase text-sm tracking-[0.2em] text-solo-gold">Informações Úteis</h4>
-
                 <div class="text-sm space-y-4 border-l-2 border-solo-gold/30 pl-5 text-solo-light-green/90 font-light mx-auto md:mx-0 table">
-
                     <div>
-
                         <p class="text-solo-gold font-bold uppercase text-[10px] tracking-widest mb-1">Check-in</p>
-
                         <p class="font-bold text-white text-base">A partir das 14:00h</p>
-
                     </div>
-
                     <div>
-
                         <p class="text-solo-gold font-bold uppercase text-[10px] tracking-widest mb-1 mt-3">Check-out</p>
-
                         <p class="font-bold text-white text-base">Até as 12:00h</p>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
-       
-
+        
         <div class="text-center border-t border-white/10 pt-8 mt-4">
-
              <div class="flex justify-center gap-6 text-xl text-solo-light-green/50 mb-6">
-
                 <a href="https://www.instagram.com/solo.nunes/" target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-instagram"></i></a>
-
-               
-
+                
                 <a href="https://wa.me/5592993138119?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20as%20reservas%20na%20Pousada%20Solo%20Nunes." target="_blank" class="hover:text-solo-gold transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
-
-               
-
+                
             </div>
-
             <p class="text-white/40 text-xs uppercase tracking-[0.2em] font-bold">&copy; 2026 Pousada Solo Nunes - Manaus/AM. Todos os direitos reservados.</p>
-
         </div>
-
     </footer>
 
     <a href="https://wa.me/5592993138119" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:bg-green-600 transition-all z-50 animate-bounce">
@@ -519,9 +481,9 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
 
         // Script Avaliações (Booking)
         const reviews = [
-            { name: "Bernardo", role: "Viajante no Booking.com", text: "\"Não poderia ter escolhido lugar melhor para relaxar, tudo perfeito na Solo Nunes. Uma experiência memorável!\"" },
-            { name: "Carlos M.", role: "Família no Booking.com", text: "\"Ótimo custo-benefício. Quarto muito limpo, ar gelando bem e atendimento excelente. Fica pertinho do aeroporto!\"" },
-            { name: "Fernanda", role: "Casal no Booking.com", text: "\"Fomos muito bem recebidos. A pousada é silenciosa, cama confortável e um ambiente super familiar. Recomendo muito.\"" }
+            { name: "Rodrigo", role: "A negócios no Booking.com", text: "\"Muito próximo ao aeroporto, facilitou muito a minha viagem a trabalho. Ambiente extremamente limpo, recepção atenciosa e quarto silencioso!\"" },
+            { name: "Larissa C.", role: "Família no Booking.com", text: "\"Fomos muito bem recebidos de madrugada. A pousada é super segura, quartos amplos e o chuveiro é excelente após os passeios.\"" },
+            { name: "Guilherme", role: "Viajante no Booking.com", text: "\"Tudo novinho e muito limpo. O ar condicionado gela muito bem (essencial em Manaus). Ótimo atendimento das meninas da recepção!\"" }
         ];
         
         let currentReview = 0;
@@ -531,7 +493,7 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
             currentReview = index;
             const container = document.getElementById('review-container');
             
-            // Efeito fade
+            // Efeito fade pelo CSS opacity
             container.style.opacity = '0';
             
             setTimeout(() => {
@@ -551,7 +513,7 @@ $quartos_destaque = array_slice($quartos_vitrine, 0, 3);
                     }
                 });
                 container.style.opacity = '1';
-            }, 300);
+            }, 500); // 500ms bate com a duration da transição CSS
 
             // Reseta o timer automático ao clicar manualmente
             clearInterval(reviewTimer);
