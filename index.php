@@ -265,7 +265,7 @@ $passeio_destaque = ($resultado_passeio && $resultado_passeio->num_rows > 0) ? $
                     <p class="text-xs text-gray-500 font-light leading-relaxed">Quartos climatizados garantindo todo o conforto durante o calor amazônico.</p>
                 </div>
                 <div data-aos="zoom-in" data-aos-delay="400">
-                    <i class="fa-solid fa-kitchen-set text-3xl text-solo-gold mb-4"></i>
+                    <i class="fa-solid fa-utensils text-3xl text-solo-gold mb-4"></i>
                     <h4 class="font-bold font-bree text-solo-green mb-2">Cozinha Compartilhada</h4>
                     <p class="text-xs text-gray-500 font-light leading-relaxed">Nossa pousada oferece uma cozinha compartilhada e equipada para maior comodidade durante a sua estadia.</p>
                 </div>
